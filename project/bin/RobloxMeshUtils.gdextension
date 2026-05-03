@@ -1,0 +1,61 @@
+[configuration]
+
+entry_symbol = "RobloxMeshUtils_Library_Init"
+compatibility_minimum = "4.1"
+reloadable = false
+
+[libraries]
+; Relative paths ensure that our GDExtension can be placed anywhere in the project directory.
+macos.single.debug = "./macos/libRobloxMeshUtils.macos.template_debug.dylib"
+macos.double.debug = "./macos/libRobloxMeshUtils.macos.template_debug.double.dylib"
+macos.single.release = "./macos/libRobloxMeshUtils.macos.template_release.dylib"
+macos.double.release = "./macos/libRobloxMeshUtils.macos.template_release.double.dylib"
+
+ios.arm64.single.debug = "./ios/libRobloxMeshUtils.ios.template_debug.arm64.dylib"
+ios.arm64.double.debug = "./ios/libRobloxMeshUtils.ios.template_debug.arm64.double.dylib"
+ios.arm64.single.release = "./ios/libRobloxMeshUtils.ios.template_release.arm64.dylib"
+ios.arm64.double.release = "./ios/libRobloxMeshUtils.ios.template_release.arm64.double.dylib"
+
+windows.x86_32.single.debug = "./windows/RobloxMeshUtils.windows.template_debug.x86_32.dll"
+windows.x86_32.double.debug = "./windows/RobloxMeshUtils.windows.template_debug.x86_32.double.dll"
+windows.x86_32.single.release = "./windows/RobloxMeshUtils.windows.template_release.x86_32.dll"
+windows.x86_32.double.release = "./windows/RobloxMeshUtils.windows.template_release.x86_32.double.dll"
+
+windows.x86_64.single.debug = "./windows/RobloxMeshUtils.windows.template_debug.x86_64.dll"
+windows.x86_64.double.debug = "./windows/RobloxMeshUtils.windows.template_debug.x86_64.double.dll"
+windows.x86_64.single.release = "./windows/RobloxMeshUtils.windows.template_release.x86_64.dll"
+windows.x86_64.double.release = "./windows/RobloxMeshUtils.windows.template_release.x86_64.double.dll"
+
+linux.x86_64.single.debug = "./linux/libRobloxMeshUtils.linux.template_debug.x86_64.so"
+linux.x86_64.double.debug = "./linux/libRobloxMeshUtils.linux.template_debug.x86_64.double.so"
+linux.x86_64.single.release = "./linux/libRobloxMeshUtils.linux.template_release.x86_64.so"
+linux.x86_64.double.release = "./linux/libRobloxMeshUtils.linux.template_release.x86_64.double.so"
+
+linux.arm64.single.debug = "./linux/libRobloxMeshUtils.linux.template_debug.arm64.so"
+linux.arm64.double.debug = "./linux/libRobloxMeshUtils.linux.template_debug.arm64.double.so"
+linux.arm64.single.release = "./linux/libRobloxMeshUtils.linux.template_release.arm64.so"
+linux.arm64.double.release = "./linux/libRobloxMeshUtils.linux.template_release.arm64.double.so"
+
+linux.rv64.single.debug = "./linux/libRobloxMeshUtils.linux.template_debug.rv64.so"
+linux.rv64.double.debug = "./linux/libRobloxMeshUtils.linux.template_debug.rv64.double.so"
+linux.rv64.single.release = "./linux/libRobloxMeshUtils.linux.template_release.rv64.so"
+linux.rv64.double.release = "./linux/libRobloxMeshUtils.linux.template_release.rv64.double.so"
+
+android.x86_64.single.debug = "./android/libRobloxMeshUtils.android.template_debug.x86_64.so"
+android.x86_64.double.debug = "./android/libRobloxMeshUtils.android.template_debug.x86_64.double.so"
+android.x86_64.single.release = "./android/libRobloxMeshUtils.android.template_release.x86_64.so"
+android.x86_64.double.release = "./android/libRobloxMeshUtils.android.template_release.x86_64.double.so"
+
+android.arm64.single.debug = "./android/libRobloxMeshUtils.android.template_debug.arm64.so"
+android.arm64.double.debug = "./android/libRobloxMeshUtils.android.template_debug.arm64.double.so"
+android.arm64.single.release = "./android/libRobloxMeshUtils.android.template_release.arm64.so"
+android.arm64.double.release = "./android/libRobloxMeshUtils.android.template_release.arm64.double.so"
+
+web.wasm32.single.debug = "./web/libRobloxMeshUtils.web.template_debug.wasm32.nothreads.wasm"
+web.wasm32.double.debug = "./web/libRobloxMeshUtils.web.template_debug.wasm32.double.nothreads.wasm"
+web.wasm32.single.release = "./web/libRobloxMeshUtils.web.template_release.wasm32.nothreads.wasm"
+web.wasm32.double.release = "./web/libRobloxMeshUtils.web.template_release.wasm32.double.nothreads.wasm"
+
+[icons]
+
+RBXFileMesh = "res://icons/FileMeshNode.svg"
