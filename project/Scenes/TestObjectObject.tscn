@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://rlh132vxm8y3"]
+
+[ext_resource type="Script" uid="uid://d38sfgyvui476" path="res://Scripts/TestObject.gd" id="1_tyc82"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" unique_id=2106524649]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+script = ExtResource("1_tyc82")
