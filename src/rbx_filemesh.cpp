@@ -1,9 +1,10 @@
 #include "rbx_filemesh.h"
 #include "godot_cpp/classes/file_access.hpp"
 #include "godot_cpp/classes/global_constants.hpp"
-#include <stdio.h>
-#include <cstdint>
 
+
+#define ERASE_STR_AT_POINT(str, pointChar) str = str.erase(0, dataStr.find(pointChar)+1);
+#define SET_FLOAT_TO_STR_DATA(str, floatData, pointChar) floatData = str.substr(0, str.find(pointChar)).to_float();
 
 //kinda ripped from this stackoverflow post:  https://stackoverflow.com/a/37327537
 int64_t nthOccurance(const String& str, const String& substr, int64_t nth) {
@@ -53,27 +54,34 @@ Error RBXFileMesh::load_from_file(const String& p_path) {
         faceNormals.resize(3);
         faceTexCoords.resize(3);
 
-        sscanf_s(dataStr.utf8().get_data(),
-        "[%f, %f, %f][%f, %f, %f][%f, %f, %f][%f, %f, %f][%f, %f, %f][%f, %f, %f][%f, %f, %f][%f, %f, %f][%f, %f, %f]",
-        &facePositions[0].x, &facePositions[0].y, &facePositions[0].z,
-        &faceNormals[0].x, &faceNormals[0].y, &faceNormals[0].z,
-        &faceTexCoords[0].x, &faceTexCoords[0].y, &temp,
-
-        &facePositions[2].x, &facePositions[2].y, &facePositions[2].z,
-        &faceNormals[2].x, &faceNormals[2].y, &faceNormals[2].z,
-        &faceTexCoords[2].x, &faceTexCoords[2].y, &temp,
-
-        &facePositions[1].x, &facePositions[1].y, &facePositions[1].z,
-        &faceNormals[1].x, &faceNormals[1].y, &faceNormals[1].z,
-        &faceTexCoords[1].x, &faceTexCoords[1].y, &temp);
-
-        dataStr = dataStr.erase(0, nthOccurance(dataStr, "]", 9) + 1);
-
         for (int32_t i = 0; i < 3; i++) {
+            int32_t index = i;
+            if (index == 1) index = 2;
+            else if (index == 2) index = 1;
+
+            ERASE_STR_AT_POINT(dataStr, "[");
+            facePositions[index].x = dataStr.substr(0, dataStr.find(",")).to_float();
+            ERASE_STR_AT_POINT(dataStr, ",");
+            facePositions[index].y = dataStr.substr(0, dataStr.find(",")).to_float();
+            ERASE_STR_AT_POINT(dataStr, ",");
+            facePositions[index].z = dataStr.substr(0, dataStr.find("]")).to_float();
+            ERASE_STR_AT_POINT(dataStr, "[");
+
+            faceNormals[index].x = dataStr.substr(0, dataStr.find(",")).to_float();
+            ERASE_STR_AT_POINT(dataStr, ",");
+            faceNormals[index].y = dataStr.substr(0, dataStr.find(",")).to_float();
+            ERASE_STR_AT_POINT(dataStr, ",");
+            faceNormals[index].z = dataStr.substr(0, dataStr.find("]")).to_float();
+            ERASE_STR_AT_POINT(dataStr, "[");
+
+            faceTexCoords[index].x = dataStr.substr(0, dataStr.find(",")).to_float();
+            ERASE_STR_AT_POINT(dataStr, ",");
+            faceTexCoords[index].y = dataStr.substr(0, dataStr.find(",")).to_float();
+
             if (version == VERSION_1) {
-                facePositions[i] *= 0.5;
+                facePositions[index] *= 0.5;
             }
-            faceTexCoords[i].y = 1.0 - faceTexCoords[i].y;
+            faceTexCoords[index].y = 1.0 - faceTexCoords[index].y;
         }
 
         vertsPositions.append_array(facePositions);
