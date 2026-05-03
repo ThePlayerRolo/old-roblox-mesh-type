@@ -5,7 +5,7 @@ import sys
 from methods import print_error
 
 
-libname = "RobloxMeshUtils"
+libname = "OldRobloxMeshUtils"
 projectdir = "project"
 
 localEnv = Environment(tools=["default"], PLATFORM="")
