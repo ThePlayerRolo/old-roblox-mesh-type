@@ -5,6 +5,8 @@
 #include "godot_cpp/classes/wrapped.hpp"
 #include "godot_cpp/variant/variant.hpp"
 #include "godot_cpp/classes/resource_format_loader.hpp"
+#include "godot_cpp/classes/file_access.hpp"
+
 
 using namespace godot;
 
@@ -13,6 +15,7 @@ class RBXFileMesh : public ArrayMesh {
 
 public:
     enum MeshVersion {
+        VERSION_NONE, // Error Version
         VERSION_1,
         VERSION_1_01,
     };
@@ -47,6 +50,9 @@ public:
 };
 
 namespace RBXFileMeshUtils {
+    /* Returns a MeshVersion based on file data */
+    RBXFileMesh::MeshVersion getVersionFromFile(Ref<FileAccess> p_file);
+
     /* Reads a Vector3 value from a Version 1 mesh file's data */
     void readV1Vec3(String& p_file_data, Vector3* p_dist);
     /* Reads a Vector3 value from a Version 1 mesh file's data */

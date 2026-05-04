@@ -1,28 +1,31 @@
 #include "rbx_filemesh.h"
-#include "godot_cpp/classes/file_access.hpp"
 #include "godot_cpp/classes/global_constants.hpp"
+#include "godot_cpp/core/error_macros.hpp"
+#include "godot_cpp/variant/packed_byte_array.hpp"
+#include <cstdint>
 
 
 //Macros to clean code a bit
-#define ERASE_STR_AT_POINT(str, pointChar) str = str.erase(0, str.find(pointChar)+1);
+#define ERASE_STR_AT_POS(str, pos) str = str.erase(0, pos);
+#define ERASE_STR_AT_CHAR(str, pointChar, offset) str = str.erase(0, str.find(pointChar)+offset);
 #define READ_VERT_FLOAT(str, floatData) floatData = str.substr(0, str.find(",")).to_float();
 
 void RBXFileMeshUtils::readV1Vec3(String& p_file_data, Vector3* p_dist) {
-    ERASE_STR_AT_POINT(p_file_data, "[");
+    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
     READ_VERT_FLOAT(p_file_data, p_dist->x);
-    ERASE_STR_AT_POINT(p_file_data, ",");
+    ERASE_STR_AT_CHAR(p_file_data, ",", 1);
     READ_VERT_FLOAT(p_file_data, p_dist->y);
-    ERASE_STR_AT_POINT(p_file_data, ",");
+    ERASE_STR_AT_CHAR(p_file_data, ",", 1);
     READ_VERT_FLOAT(p_file_data, p_dist->z);
-    ERASE_STR_AT_POINT(p_file_data, "]");
+    ERASE_STR_AT_CHAR(p_file_data, "]", 1);
 }
 
 void RBXFileMeshUtils::readV1Vec2(String& p_file_data, Vector2* p_dist) {
-    ERASE_STR_AT_POINT(p_file_data, "[");
+    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
     READ_VERT_FLOAT(p_file_data, p_dist->x);
-    ERASE_STR_AT_POINT(p_file_data, ",");
+    ERASE_STR_AT_CHAR(p_file_data, ",", 1);
     READ_VERT_FLOAT(p_file_data, p_dist->y);
-    ERASE_STR_AT_POINT(p_file_data, "]");
+    ERASE_STR_AT_CHAR(p_file_data, "]", 1);
 }
 
 void RBXFileMeshUtils::readV1VertData(String& p_file_data, Vector3* p_pos_dist, Vector3* p_normal_dist, Vector2* p_tex_coord_dist,
@@ -39,6 +42,21 @@ void RBXFileMeshUtils::readV1VertData(String& p_file_data, Vector3* p_pos_dist, 
 
 }
 
+RBXFileMesh::MeshVersion RBXFileMeshUtils::getVersionFromFile(Ref<FileAccess> p_file) {
+    String versionStr = p_file->get_line();
+
+    if (!versionStr.begins_with("version ")) {
+        return RBXFileMesh::VERSION_NONE;
+    }
+    ERASE_STR_AT_POS(versionStr, 8);
+
+    double version = versionStr.substr(0, 4).to_float();
+
+    if (version == 1.00) return RBXFileMesh::VERSION_1;
+    else if (version == 1.01) return RBXFileMesh::VERSION_1_01;
+    else return RBXFileMesh::VERSION_NONE;
+}
+
 void RBXFileMesh::_bind_methods() {
 	godot::ClassDB::bind_method(D_METHOD("load_from_file", "file_name"), &RBXFileMesh::load_from_file);
     godot::ClassDB::bind_method(D_METHOD("get_version"), &RBXFileMesh::get_version);
@@ -51,15 +69,20 @@ Error RBXFileMesh::load_from_file(const String& p_path) {
     int64_t position;
 
     ERR_FAIL_COND_V(!FileAccess::file_exists(p_path), ERR_FILE_NOT_FOUND);
-    String dataStr = FileAccess::get_file_as_string(p_path);
-    ERR_FAIL_COND_V(!(dataStr.begins_with("version 1.00") || dataStr.begins_with("version 1.01")), ERR_INVALID_DATA);
-    version = dataStr.begins_with("version 1.01") ? VERSION_1_01 : VERSION_1;
-    dataStr = dataStr.erase(0, 12);
 
-    position = dataStr.find("[");
-    int64_t faceCount = dataStr.substr(0, position).to_int();
+    Ref<FileAccess> file = FileAccess::open(p_path, FileAccess::READ);
+
+    version = RBXFileMeshUtils::getVersionFromFile(file);
+
+    ERR_FAIL_COND_V(version == VERSION_NONE, ERR_INVALID_DATA);
+
+    int64_t faceCount = file->get_line().to_int();
+
     ERR_FAIL_COND_V(faceCount == 0, ERR_INVALID_DATA);
-    dataStr = dataStr.erase(0, position);
+
+    String dataStr = file->get_as_text();
+    ERASE_STR_AT_CHAR(dataStr, "[", 0);
+
 
     PackedVector3Array vertsPositions;
     PackedVector3Array vertsNormals;
