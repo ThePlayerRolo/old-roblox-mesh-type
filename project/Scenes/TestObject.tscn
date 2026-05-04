@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bihi8y73tisum"]
 
 [ext_resource type="PackedScene" uid="uid://rlh132vxm8y3" path="res://Scenes/TestObjectObject.tscn" id="1_qkv0g"]
-[ext_resource type="RBXFileMesh" path="res://Models/sword.mesh" id="2_24uw6"]
 
 [node name="TestObject" type="Node3D" unique_id=1985085827]
 
@@ -12,7 +11,6 @@ transform = Transform3D(0.99254614, -0.0055283583, -0.121743895, 0, 0.99897057, 
 shadow_enabled = true
 
 [node name="MeshInstance3D" parent="." unique_id=2106524649 instance=ExtResource("1_qkv0g")]
-mesh = ExtResource("2_24uw6")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1387747837]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12329614, 3.3019023)
