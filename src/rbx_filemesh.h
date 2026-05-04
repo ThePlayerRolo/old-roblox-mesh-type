@@ -8,7 +8,6 @@
 
 using namespace godot;
 
-
 class RBXFileMesh : public ArrayMesh {
     GDCLASS(RBXFileMesh, ArrayMesh)
 
@@ -45,4 +44,14 @@ public:
 	virtual PackedStringArray _get_recognized_extensions() const override;
 	virtual bool _handles_type(const StringName &type) const override;
 	virtual String _get_resource_type(const String &p_path) const override;
+};
+
+namespace RBXFileMeshUtils {
+    /* Reads a Vector3 value from a Version 1 mesh file's data */
+    void readV1Vec3(String& p_file_data, Vector3* p_dist);
+    /* Reads a Vector3 value from a Version 1 mesh file's data */
+    void readV1Vec2(String& p_file_data, Vector2* p_dist);
+
+    /* Reads A Vert from a Version 1 file mesh*/
+    void readV1VertData(String& p_file_data, Vector3* p_pos_dist, Vector3* p_normal_dist, Vector2* p_tex_coord_dist, RBXFileMesh::MeshVersion version);
 };

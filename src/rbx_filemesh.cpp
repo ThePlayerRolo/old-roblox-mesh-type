@@ -3,19 +3,40 @@
 #include "godot_cpp/classes/global_constants.hpp"
 
 
-#define ERASE_STR_AT_POINT(str, pointChar) str = str.erase(0, dataStr.find(pointChar)+1);
-#define SET_FLOAT_TO_STR_DATA(str, floatData, pointChar) floatData = str.substr(0, str.find(pointChar)).to_float();
+//Macros to clean code a bit
+#define ERASE_STR_AT_POINT(str, pointChar) str = str.erase(0, str.find(pointChar)+1);
+#define READ_VERT_FLOAT(str, floatData) floatData = str.substr(0, str.find(",")).to_float();
 
-//kinda ripped from this stackoverflow post:  https://stackoverflow.com/a/37327537
-int64_t nthOccurance(const String& str, const String& substr, int64_t nth) {
-    int64_t FinalVal = -1;
-    int64_t count = 0;
-    while (count != nth) {
-        FinalVal += 1;
-        FinalVal = str.find(substr, FinalVal);
-        count++;
+void RBXFileMeshUtils::readV1Vec3(String& p_file_data, Vector3* p_dist) {
+    ERASE_STR_AT_POINT(p_file_data, "[");
+    READ_VERT_FLOAT(p_file_data, p_dist->x);
+    ERASE_STR_AT_POINT(p_file_data, ",");
+    READ_VERT_FLOAT(p_file_data, p_dist->y);
+    ERASE_STR_AT_POINT(p_file_data, ",");
+    READ_VERT_FLOAT(p_file_data, p_dist->z);
+    ERASE_STR_AT_POINT(p_file_data, "]");
+}
+
+void RBXFileMeshUtils::readV1Vec2(String& p_file_data, Vector2* p_dist) {
+    ERASE_STR_AT_POINT(p_file_data, "[");
+    READ_VERT_FLOAT(p_file_data, p_dist->x);
+    ERASE_STR_AT_POINT(p_file_data, ",");
+    READ_VERT_FLOAT(p_file_data, p_dist->y);
+    ERASE_STR_AT_POINT(p_file_data, "]");
+}
+
+void RBXFileMeshUtils::readV1VertData(String& p_file_data, Vector3* p_pos_dist, Vector3* p_normal_dist, Vector2* p_tex_coord_dist,
+    RBXFileMesh::MeshVersion version) {
+
+    readV1Vec3(p_file_data,  p_pos_dist);
+    if (version == RBXFileMesh::VERSION_1) {
+        *p_pos_dist *= 0.5f;
     }
-    return FinalVal;
+    readV1Vec3(p_file_data,  p_normal_dist);
+    readV1Vec2(p_file_data,  p_tex_coord_dist);
+
+    p_tex_coord_dist->y = 1.0f - p_tex_coord_dist->y;
+
 }
 
 void RBXFileMesh::_bind_methods() {
@@ -59,29 +80,8 @@ Error RBXFileMesh::load_from_file(const String& p_path) {
             if (index == 1) index = 2;
             else if (index == 2) index = 1;
 
-            ERASE_STR_AT_POINT(dataStr, "[");
-            facePositions[index].x = dataStr.substr(0, dataStr.find(",")).to_float();
-            ERASE_STR_AT_POINT(dataStr, ",");
-            facePositions[index].y = dataStr.substr(0, dataStr.find(",")).to_float();
-            ERASE_STR_AT_POINT(dataStr, ",");
-            facePositions[index].z = dataStr.substr(0, dataStr.find("]")).to_float();
-            ERASE_STR_AT_POINT(dataStr, "[");
-
-            faceNormals[index].x = dataStr.substr(0, dataStr.find(",")).to_float();
-            ERASE_STR_AT_POINT(dataStr, ",");
-            faceNormals[index].y = dataStr.substr(0, dataStr.find(",")).to_float();
-            ERASE_STR_AT_POINT(dataStr, ",");
-            faceNormals[index].z = dataStr.substr(0, dataStr.find("]")).to_float();
-            ERASE_STR_AT_POINT(dataStr, "[");
-
-            faceTexCoords[index].x = dataStr.substr(0, dataStr.find(",")).to_float();
-            ERASE_STR_AT_POINT(dataStr, ",");
-            faceTexCoords[index].y = dataStr.substr(0, dataStr.find(",")).to_float();
-
-            if (version == VERSION_1) {
-                facePositions[index] *= 0.5;
-            }
-            faceTexCoords[index].y = 1.0 - faceTexCoords[index].y;
+            RBXFileMeshUtils::readV1VertData(dataStr, &facePositions[index],
+                &faceNormals[index], &faceTexCoords[index], version);
         }
 
         vertsPositions.append_array(facePositions);
