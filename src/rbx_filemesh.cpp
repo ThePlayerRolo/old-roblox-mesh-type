@@ -6,8 +6,11 @@
 
 //Macros to clean code a bit
 #define ERASE_STR_AT_POS(str, pos) str = str.erase(0, pos);
-#define ERASE_STR_AT_CHAR(str, pointChar, offset) str = str.erase(0, str.find(pointChar)+offset);
-#define READ_VERT_FLOAT(str, floatData) floatData = str.substr(0, str.find(",")).to_float();
+#define ERASE_STR_AT_CHAR(str, pointChar, offset) ERASE_STR_AT_POS(str, str.find(pointChar) + offset)
+
+#define READ_VERT_FLOAT(str, floatData, charToDelete)  \
+    floatData = str.substr(0, str.find(",")).to_float(); \
+    ERASE_STR_AT_CHAR(str, charToDelete, 1)
 
 void RBXFileMesh::_bind_methods() {
 	godot::ClassDB::bind_method(D_METHOD("load_from_file", "file_name"), &RBXFileMesh::load_from_file);
@@ -89,33 +92,24 @@ RBXFileMesh::MeshVersion RBXFileMeshUtils::getVersionFromFile(Ref<FileAccess> p_
     else return RBXFileMesh::VERSION_NONE;
 }
 
-void RBXFileMeshUtils::readV1Vec3(String& p_file_data, Vector3* p_dist) {
-    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
-    READ_VERT_FLOAT(p_file_data, p_dist->x);
-    ERASE_STR_AT_CHAR(p_file_data, ",", 1);
-    READ_VERT_FLOAT(p_file_data, p_dist->y);
-    ERASE_STR_AT_CHAR(p_file_data, ",", 1);
-    READ_VERT_FLOAT(p_file_data, p_dist->z);
-    ERASE_STR_AT_CHAR(p_file_data, "]", 1);
-}
-
-void RBXFileMeshUtils::readV1Vec2(String& p_file_data, Vector2* p_dist) {
-    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
-    READ_VERT_FLOAT(p_file_data, p_dist->x);
-    ERASE_STR_AT_CHAR(p_file_data, ",", 1);
-    READ_VERT_FLOAT(p_file_data, p_dist->y);
-    ERASE_STR_AT_CHAR(p_file_data, "]", 1);
-}
-
 void RBXFileMeshUtils::readV1VertData(String& p_file_data, Vector3* p_pos_dist, Vector3* p_normal_dist,
     Vector2* p_tex_coord_dist, bool scaleVerts) {
 
-    readV1Vec3(p_file_data,  p_pos_dist);
-    if (scaleVerts) {
-        *p_pos_dist *= 0.5f;
-    }
-    readV1Vec3(p_file_data,  p_normal_dist);
-    readV1Vec2(p_file_data,  p_tex_coord_dist);
+    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
+    READ_VERT_FLOAT(p_file_data, p_pos_dist->x, ",");
+    READ_VERT_FLOAT(p_file_data, p_pos_dist->y, ",");
+    READ_VERT_FLOAT(p_file_data, p_pos_dist->z, "]");
+
+    if (scaleVerts) *p_pos_dist *= 0.5f;
+
+    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
+    READ_VERT_FLOAT(p_file_data, p_normal_dist->x, ",");
+    READ_VERT_FLOAT(p_file_data, p_normal_dist->y, ",");
+    READ_VERT_FLOAT(p_file_data, p_normal_dist->z, "]");
+
+    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
+    READ_VERT_FLOAT(p_file_data, p_tex_coord_dist->x, ",");
+    READ_VERT_FLOAT(p_file_data, p_tex_coord_dist->y, "]");
 
     p_tex_coord_dist->y = 1.0f - p_tex_coord_dist->y;
 }

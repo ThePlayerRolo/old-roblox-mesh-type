@@ -52,11 +52,6 @@ namespace RBXFileMeshUtils {
     /* Returns a MeshVersion based on file data */
     RBXFileMesh::MeshVersion getVersionFromFile(Ref<FileAccess> p_file);
 
-    /* Reads a Vector3 value from a Version 1 mesh file's data */
-    void readV1Vec3(String& p_file_data, Vector3* p_dist);
-    /* Reads a Vector3 value from a Version 1 mesh file's data */
-    void readV1Vec2(String& p_file_data, Vector2* p_dist);
-
     /* Reads A Vert from a Version 1 file mesh*/
     void readV1VertData(String& p_file_data, Vector3* p_pos_dist, Vector3* p_normal_dist, Vector2* p_tex_coord_dist, bool scaleVerts);
 
