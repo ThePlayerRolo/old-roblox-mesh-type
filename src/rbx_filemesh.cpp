@@ -92,28 +92,6 @@ RBXFileMesh::MeshVersion RBXFileMeshUtils::getVersionFromFile(Ref<FileAccess> p_
     else return RBXFileMesh::VERSION_NONE;
 }
 
-void RBXFileMeshUtils::readV1VertData(String& p_file_data, Vector3* p_pos_dist, Vector3* p_normal_dist,
-    Vector2* p_tex_coord_dist, bool scaleVerts) {
-
-    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
-    READ_VERT_FLOAT(p_file_data, p_pos_dist->x, ",");
-    READ_VERT_FLOAT(p_file_data, p_pos_dist->y, ",");
-    READ_VERT_FLOAT(p_file_data, p_pos_dist->z, "]");
-
-    if (scaleVerts) *p_pos_dist *= 0.5f;
-
-    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
-    READ_VERT_FLOAT(p_file_data, p_normal_dist->x, ",");
-    READ_VERT_FLOAT(p_file_data, p_normal_dist->y, ",");
-    READ_VERT_FLOAT(p_file_data, p_normal_dist->z, "]");
-
-    ERASE_STR_AT_CHAR(p_file_data, "[", 1);
-    READ_VERT_FLOAT(p_file_data, p_tex_coord_dist->x, ",");
-    READ_VERT_FLOAT(p_file_data, p_tex_coord_dist->y, "]");
-
-    p_tex_coord_dist->y = 1.0f - p_tex_coord_dist->y;
-}
-
 Error RBXFileMeshUtils::load_from_v1_file(Ref<FileAccess> p_file, PackedVector3Array& p_pos_arr_dist, PackedVector3Array& p_normal_arr_dist,
     PackedVector2Array& p_tex_coord_arr_dist, bool scaleVerts) {
     int64_t faceCount = p_file->get_line().to_int();
@@ -138,8 +116,23 @@ Error RBXFileMeshUtils::load_from_v1_file(Ref<FileAccess> p_file, PackedVector3A
             if (index == 1) index = 2;
             else if (index == 2) index = 1;
 
-            RBXFileMeshUtils::readV1VertData(dataStr, &facePositions[index],
-                &faceNormals[index], &faceTexCoords[index], scaleVerts);
+            ERASE_STR_AT_CHAR(dataStr, "[", 1);
+            READ_VERT_FLOAT(dataStr, facePositions[index].x, ",");
+            READ_VERT_FLOAT(dataStr, facePositions[index].y, ",");
+            READ_VERT_FLOAT(dataStr, facePositions[index].z, "]");
+
+            if (scaleVerts) facePositions[index] *= 0.5f;
+
+            ERASE_STR_AT_CHAR(dataStr, "[", 1);
+            READ_VERT_FLOAT(dataStr, faceNormals[index].x, ",");
+            READ_VERT_FLOAT(dataStr, faceNormals[index].y, ",");
+            READ_VERT_FLOAT(dataStr, faceNormals[index].z, "]");
+
+            ERASE_STR_AT_CHAR(dataStr, "[", 1);
+            READ_VERT_FLOAT(dataStr, faceTexCoords[index].x, ",");
+            READ_VERT_FLOAT(dataStr, faceTexCoords[index].y, "]");
+
+            faceTexCoords[index].y = 1.0f - faceTexCoords[index].y;
         }
 
         p_pos_arr_dist.append_array(facePositions);
